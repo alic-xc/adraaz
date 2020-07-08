@@ -1,0 +1,79 @@
+{% extends 'base_ecommerce.html' %}
+{%  load static %}
+{%  load humanize %}
+{% block style %}
+    <link type="text/css" rel="stylesheet" href="{% static 'styles/product_styles.css' %}">
+    <link type="text/css" rel="stylesheet" href="{% static 'styles/product_responsive.css' %}">
+{% endblock %}
+{% block content %}
+	<div class="home">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/shop_background.jpg' %}"></div>
+		<div class="home_overlay"></div>
+		<div class="home_content d-flex flex-column align-items-center justify-content-center">
+			<h2 class="home_title">{{ product }}</h2>
+		</div>
+	</div>
+
+	<!-- Shop -->
+    <div class="single_product">
+		<div class="container">
+			<div class="row">
+
+				<!-- Images -->
+				<div class="col-lg-2 order-lg-1 order-2">
+					<ul class="image_list">
+                        {% if product.image_1 %}
+                            <li data-image="{{ product.image_1.url }}"><img src="{{ product.image_1.url }}" alt=""></li>
+                        {% endif %}
+                        {% if product.image_2 %}
+                            <li data-image="{{ product.image_2.url }}"><img src="{{ product.image_2.url }}" alt=""></li>
+                        {% endif %}
+					</ul>
+				</div>
+
+				<!-- Selected Image -->
+				<div class="col-lg-5 order-lg-2 order-1">
+					<div class="image_selected"><img src="{{ product.display_picture.url }}" alt=""></div>
+				</div>
+
+				<!-- Description -->
+				<div class="col-lg-5 order-3">
+					<div class="product_description">
+						<div class="product_category">{{ product.category.name }}</div>
+						<div class="product_name">{{ product.name }} ({{ product.product_type }}) </div>
+						<div class="product_text">
+                            <p>{{ product.description|safe }}</p>
+                        </div>
+						<div class="order_info d-flex flex-row">
+							<form action="#">
+								<div class="clearfix" style="z-index: 1000;">
+									<!-- Product Quantity -->
+									<div class="product_quantity clearfix">
+										<span>Quantity: </span>
+										<input id="quantity_input" type="text" pattern="[0-9]*" value="1">
+										<div class="quantity_buttons">
+											<div id="quantity_inc_button" class="quantity_inc quantity_control"><i class="fas fa-chevron-up"></i></div>
+											<div id="quantity_dec_button" class="quantity_dec quantity_control"><i class="fas fa-chevron-down"></i></div>
+										</div>
+									</div>
+								</div>
+
+								<div class="product_price">₦{{ product.selling_price|intcomma }}</div>
+								<div class="button_container">
+									<button type="button" class="button cart_button">Add to Cart</button>
+									<div class="product_fav"><i class="fas fa-heart"></i></div>
+								</div>
+
+							</form>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<hr>
+	<!-- Newsletter -->
+
+{% endblock content %}
