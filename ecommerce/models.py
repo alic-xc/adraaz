@@ -10,6 +10,7 @@ import ast
 
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
+    image = models.ImageField(upload_to='category', blank=True)
 
     def __str__(self):
         return self.name
@@ -17,6 +18,7 @@ class Category(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=200, unique=True)
+    image = models.ImageField(upload_to='brand', blank=True)
 
     def __str__(self):
         return self.name
@@ -134,10 +136,16 @@ class SliderText(models.Model):
         return self.title
 
 
-class DealProducts(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    duration = models.DateTimeField()
+class Contact(models.Model):
+    full_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=200)
+    phone_number = models.CharField(max_length=13)
+    address = models.TextField(max_length=200)
 
     def __str__(self):
-        return self.product.name
+        return self.full_name
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        return super().save()

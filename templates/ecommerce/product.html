@@ -13,15 +13,14 @@
 			<h2 class="home_title">{{ product }}</h2>
 		</div>
 	</div>
-
 	<!-- Shop -->
     <div class="single_product">
 		<div class="container">
 			<div class="row">
-
 				<!-- Images -->
 				<div class="col-lg-2 order-lg-1 order-2">
 					<ul class="image_list">
+						<li data-image="{{ product.display_picture.url }}"><img src="{{ product.display_picture.url }}" alt=""></li>
                         {% if product.image_1 %}
                             <li data-image="{{ product.image_1.url }}"><img src="{{ product.image_1.url }}" alt=""></li>
                         {% endif %}
@@ -50,7 +49,7 @@
 									<!-- Product Quantity -->
 									<div class="product_quantity clearfix">
 										<span>Quantity: </span>
-										<input id="quantity_input" type="text" pattern="[0-9]*" value="1">
+										<input id="quantity_input" class="qty" name="qty" type="text" pattern="[0-9]*" value="1">
 										<div class="quantity_buttons">
 											<div id="quantity_inc_button" class="quantity_inc quantity_control"><i class="fas fa-chevron-up"></i></div>
 											<div id="quantity_dec_button" class="quantity_dec quantity_control"><i class="fas fa-chevron-down"></i></div>
@@ -60,7 +59,7 @@
 
 								<div class="product_price">₦{{ product.selling_price|intcomma }}</div>
 								<div class="button_container">
-									<button type="button" class="button cart_button">Add to Cart</button>
+									<button type="button" class="button cart_button tocart"  data-product="{{ product.id }}">Add to Cart</button>
 									<div class="product_fav"><i class="fas fa-heart"></i></div>
 								</div>
 
@@ -70,6 +69,18 @@
 				</div>
 
 			</div>
+			<div class="row">
+				<div class="col-lg-12">
+
+					<div class="mt-5">
+						<h3 class="text-muted">Product Description</h3>
+						<hr>
+					</div>
+					<div>
+						{{ product.description|safe }}
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -77,3 +88,34 @@
 	<!-- Newsletter -->
 
 {% endblock content %}
+
+{% block script %}
+	<script type="text/javascript">
+		function cart(bookId, qty, action){
+
+			const request = fetch(`{% url 'cart' %}?product=${bookId}&qty=${qty}&action=${action}`,{
+				'method': 'GET',
+				'header': {'Content-Type' :'application/json'},
+			})
+
+			request.then(function(response){
+				if(response.status == 200){
+					location.reload()
+				}
+				return response.json()
+			})
+
+
+		}
+
+		document.addEventListener('DOMContentLoaded', ()=>{
+			const cartLink = document.querySelector('.tocart')
+			const qty = document.querySelector('.qty')
+			cartLink.onclick = function(e){
+				e.preventDefault()
+				cart(this.dataset['product'], qty.value, 'update')
+			}
+
+		})
+	</script>
+{% endblock script%}

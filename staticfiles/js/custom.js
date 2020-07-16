@@ -157,12 +157,12 @@ $(document).ready(function()
 		});
 
 
-		$('select').on('change', function (e)
-		{
-			placeholder.text(this.value);
-
-			$(this).animate({width: placeholder.width() + 'px' });
-		});
+//		$('select').on('change', function (e)
+//		{
+//			placeholder.text(this.value);
+//
+//			$(this).animate({width: placeholder.width() + 'px' });
+//		});
 	}
 
 	/* 

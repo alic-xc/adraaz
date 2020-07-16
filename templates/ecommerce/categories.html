@@ -1,6 +1,10 @@
 {% extends 'base_ecommerce.html' %}
 {%  load static %}
 {%  load humanize %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/shop_styles.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/shop_responsive.css' %}">
+{% endblock style %}
 {% block content %}
 	<div class="home">
 		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/shop_background.jpg' %}"></div>
@@ -68,7 +72,7 @@
 									<div class="product_content">
 										<div class="product_price"> <a href="{% url 'product' product.id %}" tabindex="0">{{ product.name}}</a> </div>
 										<div class="product_name"><div>₦{{ product.selling_price|intcomma }}</div></div>
-										<div class="product_name"><div><btn class="btn btn-primary btn-sm" tabindex="0">Add to cart</btn></div></div>
+										<div class="product_name"><div><button class="btn btn-primary btn-sm cart-add" data-qty="1" href="#" data-product="{{ product.id }}" tabindex="0">Add to cart</button></div></div>
 									</div>
 									<div class="product_fav"><i class="fas fa-heart"></i></div>
 									<ul class="product_marks">

@@ -7,13 +7,13 @@ from django.shortcuts import render, reverse
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import generic
-from helpers.services import get_categories, get_product, get_brands
+from helpers.services import get_categories, get_product, get_brands, ContentMixin
 from ecommerce.models import ShippingInfo, ShippingLocation, Product
 from .forms import UserRegistrationForm, LoginForm, PlainForm, ContactForm
 #
 
 
-class HomepageView(generic.TemplateView):
+class HomepageView(ContentMixin, generic.TemplateView):
     template_name = 'website/index.html'
 
     def get_context_data(self, **kwargs):

@@ -1,0 +1,113 @@
+{% load humanize %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>your order </title>
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000;">
+<div style="width: 680px;"><a href="#"><img src="{% static 'images/logo/logo.png' %}" alt="lasebooks" style="margin-bottom: 20px; border: none;" /></a>
+  <p style="margin-top: 0px; margin-bottom: 20px;">
+      Thank you for your interest in adraaz products. Your order has been received and will be processed once payment has been confirmed.<br/>
+        To view your order click on the link below:
+
+  </p>
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;" colspan="2">Order Detail</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+          <b>Order ID</b> {{ context.order.token }}<br />
+          <b>Date Added</b> {{ context.order.order_date }}<br />
+          <b>Payment Method</b> {{ context.payment }}<br />
+          <b>Order Status</b> {{ context.order.status }}<br />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">Shipping Details</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+            <b>Full  Name</b> {{ context.user_shipping.first_name }} {{ context.user_shipping.last_name }}<br />
+          <b>Phone Number</b> {{ context.user_shipping.phone_number }}<br />
+          <b>Address</b> {{ context.user_shipping.address }}<br />
+          <b>Email</b> {{ context.user_shipping.email_address }}<br />
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+    {% if context.payment == 'bank' %}
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">Payment Details</td>
+      </tr>
+    </thead>
+    <tbody>
+    {% for bank in context.banks %}
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+            <b>Bank Name</b>  {{ bank.bank_name }}<br />
+          <b>Account Number</b> {{ bank.acc_no }}<br />
+          <b>Account Name</b> {{ bank.acc_name }}<br />
+
+        </td>
+      </tr>
+    {%  endfor %}
+
+    </tbody>
+  </table>
+
+    {% endif %}
+
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">Title</td>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 7px; color: #222222;">Qty</td>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 7px; color: #222222;">Price</td>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 7px; color: #222222;">Amount</td>
+      </tr>
+    </thead>
+    <tbody>
+    {% for id, book in context.carts.items %}
+            <tr>
+                <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ book.title }}</td>
+                <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ book.qty }}</td>
+                <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">₦{{ book.price|intcomma }}</td>
+                <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">₦{{ book.amount|intcomma }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;" colspan="3"><b>Sub-Total:</b></td>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">₦{{ context.extra.total_amount|intcomma }}</td>
+      </tr>
+    <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;" colspan="3"><b>Shipping Rate:</b></td>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;"> ₦ {{ context.shipping.price|intcomma }} </td>
+      </tr>
+    <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;" colspan="3"><b>Total:</b></td>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">₦{{ context.extra.total_amount|intcomma }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  <p style="margin-top: 0px; margin-bottom: 20px;">Please reply to this e-mail if you have any questions.</p>
+</div>
+</body>
+</html>

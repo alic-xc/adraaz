@@ -145,11 +145,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
-API_END_POINT = config('API_END_POINT')
-
-API_TOKEN = config('API_TOKEN')
-
-SUCCESS_CODES = config('SUCCESS_CODES', default='*', cast=Csv(int))
+EMAIL_BACKEND = config('EMAIL_BACKEND')
 
 CKEDITOR_UPLOAD_PATH = 'products/extra_images/'
 

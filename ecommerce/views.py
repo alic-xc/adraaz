@@ -15,8 +15,22 @@ from .forms import *
 class ContentMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['categories'] = get_categories(self.request, 0)
         context['brands'] = get_brands(self.request, 0)
+        context['carts'] = self.request.session.get('cart', {})
+        # calculations for cart
+        if context['carts']:
+            amount = 0
+            qty = 0
+            for cart_id, cart_items in context['carts'].items():
+                amount += float(cart_items['amount'])
+                qty += int(cart_items['qty'])
+
+            context['cart_extra'] = {
+                'total_amount': amount,
+                'total_qty': qty,
+                'total_items': len(context['carts'])
+            }
+        context['categories'] = get_categories(self.request, 0)
         return context
 
 
@@ -84,7 +98,7 @@ class CartView(ContentMixin, generic.TemplateView):
 
 class CheckoutView(ContentMixin, generic.FormView):
     template_name = 'ecommerce/checkout.html'
-    form_class = PlainForm
+    form_class = ShippingForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -94,6 +108,10 @@ class CheckoutView(ContentMixin, generic.FormView):
 
     def get_success_url(self):
         return reverse('checkout')
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         try:
@@ -105,90 +123,22 @@ class CheckoutView(ContentMixin, generic.FormView):
             if self.request.POST['payment'] == 'bank':
                 email_context['banks'] = Banks.objects.all()
 
-            if self.request.POST['type'] == 'returning':
-                if self.request.POST['address-type'] == 'saved':
-                    with transaction.atomic():
-                        order = Order(user=self.request.user, cart=cart_items,
-                                      total=context['cart_extra']['total_amount'],
-                                      shipping_id=self.request.POST['shipping'],
-                                      user_shipping_id=self.request.POST['saved_location'],
-                                      payment_method=self.request.POST['payment'], status='pending')
-                        order.save()
-                        # get shipping detail for email
-                        email_context['user_shipping'] = ShippingInfo.objects.get(user_id = self.request.user.id)
-                else:
-                    form = self.get_form(ShippingForm)
-                    if form.is_valid():
-                        with transaction.atomic():
-                            save_shipping = ''
-                            if self.request.POST.get('save_shipping_db'):
-                                shipping = ShippingInfo(user=self.request.user, address=form.cleaned_data['home_address'],
-                                                        first_name=form.cleaned_data['first_name'],
-                                                        last_name=form.cleaned_data['last_name'],
-                                                        phone_number=form.cleaned_data['phone'],
-                                                        email_address=form.cleaned_data['email'],
-                                                        primary=False)
-                                shipping.save()
-                                save_shipping = shipping.id
-                                # get email shipping address
-
-                            order = Order(user='self.request.user', cart=cart_items,
-                                          total=context['cart_extra']['total_amount'],
-                                          shipping_id=self.request.POST['shipping'],
-                                          user_shipping_id=save_shipping, payment_method=self.request.POST['payment'],
-                                          status='pending')
-                            order.save()
-
-                        email_context['user_shipping'] = ShippingInfo.objects.get(id=save_shipping)
-                    else:
-                        return super().form_invalid(form)
-
-            elif self.request.POST['type'] == 'new':
-                if self.request.POST.get('createaccount'):
-                    form = self.get_form(UserRegistrationForm)
-                    if form.is_valid():
-                        with transaction.atomic():
-                            user = User(username=form.cleaned_data['username'], email=form.cleaned_data['email'],
+            with transaction.atomic():
+                shipping = ShippingInfo(address=form.cleaned_data['home_address'],
                                         first_name=form.cleaned_data['first_name'],
-                                        last_name=form.cleaned_data['last_name'])
-                            user.set_password(form.cleaned_data['password'])
-                            user.save()
+                                        last_name=form.cleaned_data['last_name'],
+                                        phone_number=form.cleaned_data['phone'],
+                                        email_address=form.cleaned_data['email'],
+                                        primary=True)
+                shipping.save()
+                order = Order(cart=cart_items,
+                              total=context['cart_extra']['total_amount'],
+                              shipping_id=self.request.POST['shipping'],
+                              user_shipping_id=shipping.id, payment_method=self.request.POST['payment'],
+                              status='pending')
+                order.save()
 
-                            shipping = ShippingInfo(user=user, address=form.cleaned_data['home_address'],
-                                                    first_name=form.cleaned_data['first_name'],
-                                                    last_name=form.cleaned_data['last_name'],
-                                                    phone_number=form.cleaned_data['phone'],
-                                                    email_address=form.cleaned_data['email'],
-                                                    primary=True)
-                            shipping.save()
-
-                            order = Order(user=user, cart=cart_items,
-                                          total=context['cart_extra']['total_amount'],
-                                          shipping_id=self.request.POST['shipping'],
-                                          user_shipping_id=shipping.id, payment_method=self.request.POST['payment'],
-                                          status='pending')
-                            order.save()
-                        email_context['user_shipping'] = ShippingInfo.objects.get(id = shipping.id)
-                    else:
-                        return super().form_invalid(form)
-                else:
-                    form = self.get_form(ShippingForm)
-                    if form.is_valid():
-                        with transaction.atomic():
-                            shipping = ShippingInfo(address=form.cleaned_data['home_address'],
-                                                    first_name=form.cleaned_data['first_name'],
-                                                    last_name=form.cleaned_data['last_name'],
-                                                    phone_number=form.cleaned_data['phone'],
-                                                    email_address=form.cleaned_data['email'],
-                                                    primary=True)
-                            shipping.save()
-                            order = Order(cart=cart_items,
-                                          total=context['cart_extra']['total_amount'],
-                                          shipping_id=self.request.POST['shipping'],
-                                          user_shipping_id=shipping.id, payment_method=self.request.POST['payment'],
-                                          status='pending')
-                            order.save()
-                    email_context['user_shipping'] = ShippingInfo.objects.get(id=shipping.id)
+            email_context['user_shipping'] = ShippingInfo.objects.get(id=shipping.id)
 
             email_context['order'] = order
             self.request.session.modified = True
@@ -217,7 +167,6 @@ def cart_action(request):
         if not request.session['cart'].get(product) and (action == 'add' or action == 'update'):
             try:
                 product_obj = Product.objects.get(id=product)
-
                 request.session['cart'][product] = {'title': product_obj.name, 'qty': int(qty),
                                                  'price': str(product_obj.selling_price),
                                                  'amount': str(product_obj.selling_price * int(qty)),
@@ -226,13 +175,13 @@ def cart_action(request):
             except Product.DoesNotExist:
                 pass
         else:
-            if action == 'add':
+            if action == 'add' and int(qty) > 0:
                 request.session['cart'][product]['qty'] += int(qty)
                 request.session['cart'][product]['amount'] = str(int(request.session['cart'][product]['qty']) *
                                                               float(request.session['cart'][product]['price']))
                 messages.success(request, "Product added to cart successfully")
 
-            elif action == 'update':
+            elif action == 'update' and int(qty) > 0:
                 request.session['cart'][product]['qty'] = int(qty)
                 request.session['cart'][product]['amount'] = str(int(qty) * float(request.session['cart'][product]['price']))
                 messages.success(request, "your cart have been updated successfully")
