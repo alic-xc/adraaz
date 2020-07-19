@@ -85,14 +85,15 @@
 		}
 
 		document.addEventListener('DOMContentLoaded', ()=>{
-			const cartLink = document.querySelector('.tocart')
-			const qty = document.querySelector('.qty')
-			if(qty != 0){
-				cartLink.onclick = function(e){
+			const cartDeleteLink = document.querySelectorAll('.cart-delete')
+			cartDeleteLink.forEach(function(elem){
+				elem.onclick = function(e){
 					e.preventDefault()
-					cart(this.dataset['product'], qty.value, 'update')
+					cart(this.dataset['product'], 0 , 'delete')
 				}
-			}
+			})
 		})
+
+
 	</script>
 {% endblock script%}
