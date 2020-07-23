@@ -6,7 +6,7 @@ class ContentMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['carts'] = self.request.session.get('cart', {})
-        context['contact'] = Contact.objects.all()
+        context['contact'] = Contact.objects.first()
         # calculations for cart
         if context['carts']:
             amount = 0

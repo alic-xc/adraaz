@@ -6,8 +6,8 @@ from django.shortcuts import render, reverse
 from django.template.loader import render_to_string
 from django.views import generic
 from helpers.services import get_brands, get_categories
-from ecommerce.models import Banks, Brand, Category, Order, Product, ShippingInfo, ShippingLocation
-from website.forms import UserRegistrationForm
+from ecommerce.models import Banks, Brand, Category, Order, Product, ShippingInfo, ShippingLocation, Contact
+from django.db.models import Q
 from .forms import *
 # Create your views here.
 
@@ -15,6 +15,7 @@ from .forms import *
 class ContentMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
+        context['contact'] = Contact.objects.first()
         context['brands'] = get_brands(self.request, 0)
         context['carts'] = self.request.session.get('cart', {})
         # calculations for cart
@@ -153,6 +154,19 @@ class CheckoutView(ContentMixin, generic.FormView):
             return super().form_invalid(form)
 
         return super().form_valid(form)
+
+
+class SearchView(ContentMixin, generic.TemplateView):
+    template_name = 'ecommerce/search.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        search = self.request.GET.get('q')
+        products = Product.objects.filter(Q(name__icontains=search) | Q(model__icontains=search))
+        context['search'] = search
+        context['products'] = products
+        context['product_count'] = products.count()
+        return context
 
 
 def cart_action(request):

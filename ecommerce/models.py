@@ -138,7 +138,7 @@ class SliderText(models.Model):
 
 class Contact(models.Model):
     full_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=200)
+    email = models.EmailField(max_length=200, unique=True)
     phone_number = models.CharField(max_length=13)
     address = models.TextField(max_length=200)
 
@@ -149,3 +149,10 @@ class Contact(models.Model):
              update_fields=None):
 
         return super().save()
+
+
+class SubscriberNewsLetter(models.Model):
+    email = models.EmailField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.email

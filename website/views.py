@@ -21,7 +21,6 @@ class HomepageView(ContentMixin, generic.TemplateView):
         context['categories'] = get_categories(self.request, 10)
         context['products'] = get_product(self.request, 10)
         context['brands'] = get_brands(self.request, 10)
-        context['deal_of_week'] = get_product(self.request, 1)
         return context
 
 
@@ -69,27 +68,20 @@ class LoginView(generic.FormView):
         return super().form_valid(form)
 
 
-class ContactView(generic.FormView):
-    template_name = 'ecommerce/contact.html'
+class ContactView(ContentMixin, generic.FormView):
+    template_name = 'website/contact.html'
     form_class = ContactForm
     success_url = reverse_lazy('contact')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['categories'] = get_categories(self.request, 10)
+        return context
 
     def form_valid(self, form):
         contact_mail(form.cleaned_data)
         messages.success(self.request, "Message sent successfully.")
         return super().form_valid(form)
-
-
-class SearchView(generic.TemplateView):
-    template_name = 'books/category.html'
-
-    def get(self, request, *args, **kwargs):
-        context = super().get_context_data()
-        if request.GET.get('q'):
-            search = request.GET.get('q')
-            products = Product.objects.filter(title__icontains=search)
-            context['products'] = products
-        return render(request, self.template_name, context)
 
 
 def contact_mail(obj):

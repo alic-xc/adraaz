@@ -9,4 +9,6 @@ urlpatterns = [
     path('cart', cart_action, name='cart'),
     path('cart/view', CartView.as_view(), name='cart_view'),
     path('checkout', CheckoutView.as_view(), name='checkout'),
+    path('search', SearchView.as_view(), name='search')
+
 ]

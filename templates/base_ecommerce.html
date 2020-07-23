@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>OneTech</title>
+<title>Adraaz, Affordable UK used laptops, printers, smartphones etc.</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="OneTech shop project">
+<meta name="description" content="Adraaz, Shopping UK used laptops, desktops, printers etc.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="{% static 'styles/bootstrap4/bootstrap.min.css' %}">
 <link href="{% static 'plugins/fontawesome-free-5.0.1/css/fontawesome-all.css' %}" rel="stylesheet" type="text/css">
@@ -42,26 +42,6 @@
 					<div class="col d-flex flex-row">
 						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static 'images/phone.png' %}" alt=""></div>{{ contact.phone_number }}</div>
 						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static 'images/mail.png' %}" alt=""></div><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></div>
-						<div class="top_bar_content ml-auto">
-							<!--
-							<div class="top_bar_menu">
-								<ul class="standard_dropdown top_bar_dropdown">
-									<li>
-										<a href="#">English</a>
-									</li>
-									<li>
-										<a href="#">Naira</a>
-									</li>
-								</ul>
-							</div>
-							<div class="top_bar_user">
-								<div class="user_icon"><img src="images/user.svg" alt=""></div>
-								<div><a href="">Register</a></div>
-								<div><a href="">Sign in</a></div>
-
-							</div>
-							-->
-						</div>
 					</div>
 				</div>
 			</div>
@@ -84,8 +64,8 @@
 						<div class="header_search">
 							<div class="header_search_content">
 								<div class="header_search_form_container">
-									<form action="#" class="header_search_form clearfix">
-										<input type="search" required="required" class="header_search_input" placeholder="Search for products...">
+									<form action="{% url 'search' %}" class="header_search_form clearfix">
+										<input type="search" name="q" required="required" class="header_search_input" placeholder="Search for products...">
 										<div class="custom_dropdown">
 											<div class="custom_dropdown_list">
 												<span class="custom_dropdown_placeholder clc">All Categories</span>
