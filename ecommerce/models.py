@@ -116,6 +116,23 @@ class Order(models.Model):
         html_table = html_table + body
         return format_html(html_table)
 
+    def user_details(self):
+        html_table = "<table cellpadding='1'><thead><tr><th> Name </th> <th>Phone Number</th><th>Email Address </th> " \
+                     "<th>Home Address</th> </tr></thead> "
+        body = "<tbody>"
+        body += "<tr>"
+        fullname = self.user_shipping.first_name
+        email = self.user_shipping.email_address
+        phone = self.user_shipping.phone_number
+        address = self.user_shipping.address
+        body = body + "<td>" + fullname + "</td>"
+        body = body + "<td>" + email + "</td>"
+        body = body + "<td>" + phone + "</td>"
+        body = body + "<td>" + address + "</td>"
+        body = body + "</tr></tbody></table>"
+        html_table = html_table + body
+        return format_html(html_table)
+
     def __str__(self):
         try:
             return str(self.token + " " + self.user.username)
